@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Карта танцювальних студій — адаптивні тултіпи</title>
+    <title>Карта танцювальних студій — трекінг кліків</title>
 
     <!-- Leaflet CSS -->
     <link
@@ -16,16 +16,31 @@
     <!-- Власні стилі -->
     <link rel="stylesheet" href="styles.css" />
 
+    <!-- Simple Analytics: базовий скрипт (авто-трекінг переглядів сторінок) -->
+    <script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+    <!-- Фолбек-черга на випадок, якщо скрипт ще не завантажився на момент виклику події -->
+    <script>
+        window.sa_event = window.sa_event || function() {
+            (window.sa_event.q = window.sa_event.q || []).push(arguments);
+        };
+        // Якщо хочеш власну подію відкриття сторінки, розкоментуй:
+        // document.addEventListener('DOMContentLoaded', () => {
+        //   sa_event('site_open', { page: location.pathname });
+        // });
+    </script>
 </head>
 <body>
 <div id="map"></div>
 
+<!-- Leaflet JS -->
 <script
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""
 ></script>
+
 <script>
+    // Дані студій
     const STUDIOS = [
         {"студія":"Rock Dance Studio, Хрещатик","заголовок":"Бугі-вугі","адреса":"Київ, вул. Хрещатик 32А","контакт":"380962478620","lat":50.44705,"lng":30.52056},
         {"студія":"Rock Dance Studio, Оболонь","заголовок":"Бугі-вугі","адреса":"Київ, просп. В. Івасюка 10А","контакт":"380962478620","lat":50.49899,"lng":30.51704},
@@ -40,9 +55,11 @@
         {"студія":"CubanoBoom","заголовок":"Salsa Casino","адреса":"Київ, вул. Шимановського 2/1, оф. 334","контакт":"672899010","lat":50.455278,"lng":30.605}
     ];
 
+    // Плитки MapTiler (можеш залишити як є)
     const MAPTILER_KEY = "tJoJlJ4VvyIVk26MvPbb";
     const TILE_URL = `https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}@2x.png?key=${MAPTILER_KEY}`;
 
+    // Ініціалізація карти
     const map = L.map('map').setView([50.450001, 30.523333], 12);
     L.tileLayer(TILE_URL, {
         attribution: '&copy; OpenStreetMap contributors, &copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>',
@@ -50,6 +67,7 @@
         maxZoom: 19
     }).addTo(map);
 
+    // Додавання маркерів + тултіпів + попапів + трекінг кліку
     const bounds = [];
     for (const item of STUDIOS) {
         if (typeof item.lat !== 'number' || typeof item.lng !== 'number') continue;
@@ -72,8 +90,18 @@
         </div>`;
         marker.bindPopup(html);
 
+        // 🔹 ТРЕКІНГ: фіксуємо клік по маркеру в Simple Analytics
+        marker.on('click', () => {
+            sa_event('marker_click', {
+                studio: item["студія"],
+                title: item["заголовок"],
+                address: item["адреса"]
+            });
+        });
+
         bounds.push([item.lat, item.lng]);
     }
+
     if (bounds.length) map.fitBounds(bounds, { padding: [30, 30] });
 </script>
 </body>
