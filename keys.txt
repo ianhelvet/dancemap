@@ -1,0 +1,1 @@
+MAPTILER_KEY = "tJoJlJ4VvyIVk26MvPbb"

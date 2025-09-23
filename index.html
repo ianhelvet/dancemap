@@ -3,36 +3,19 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Карта танцювальних студій — з підписами “заголовок”</title>
+    <title>Карта танцювальних студій — адаптивні тултіпи</title>
+
+    <!-- Leaflet CSS -->
     <link
             rel="stylesheet"
             href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
             integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
             crossorigin=""
     />
-    <style>
-        html, body, #map { height: 100%; margin: 0; }
-        .popup h3 { margin: 0 0 6px; font-size: 16px; }
-        .popup .muted { color:#555; font-size: 12px; }
 
-        /* Стилі завжди-видимого підпису (tooltip) */
-        .leaflet-tooltip.my-tooltip {
-            background: #ffffff;
-            color: #111;
-            border: 1px solid #d0d0d0;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,.15);
-            /* прибрати стандартний трикутник */
-        }
-        .leaflet-tooltip-top.my-tooltip::before,
-        .leaflet-tooltip-right.my-tooltip::before,
-        .leaflet-tooltip-left.my-tooltip::before,
-        .leaflet-tooltip-bottom.my-tooltip::before {
-            display: none;
-        }
-    </style>
+    <!-- Власні стилі -->
+    <link rel="stylesheet" href="styles.css" />
+
 </head>
 <body>
 <div id="map"></div>
@@ -43,7 +26,6 @@
         crossorigin=""
 ></script>
 <script>
-    // Дані з уже прорахованими координатами
     const STUDIOS = [
         {"студія":"Rock Dance Studio, Хрещатик","заголовок":"Бугі-вугі","адреса":"Київ, вул. Хрещатик 32А","контакт":"380962478620","lat":50.44705,"lng":30.52056},
         {"студія":"Rock Dance Studio, Оболонь","заголовок":"Бугі-вугі","адреса":"Київ, просп. В. Івасюка 10А","контакт":"380962478620","lat":50.49899,"lng":30.51704},
@@ -58,42 +40,36 @@
         {"студія":"CubanoBoom","заголовок":"Salsa Casino","адреса":"Київ, вул. Шимановського 2/1, оф. 334","контакт":"672899010","lat":50.455278,"lng":30.605}
     ];
 
-    // Конфіг тайлів (MapTiler) — вставте ваш ключ
     const MAPTILER_KEY = "tJoJlJ4VvyIVk26MvPbb";
     const TILE_URL = `https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}@2x.png?key=${MAPTILER_KEY}`;
 
-    // Ініціалізація карти (центр Київ)
     const map = L.map('map').setView([50.450001, 30.523333], 12);
-
     L.tileLayer(TILE_URL, {
-        attribution:
-            '&copy; OpenStreetMap contributors, &copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>',
+        attribution: '&copy; OpenStreetMap contributors, &copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>',
         tileSize: 256,
+        maxZoom: 19
     }).addTo(map);
 
-    // Маркери + попапи + постійні тайтли (tooltip з “заголовок”)
     const bounds = [];
     for (const item of STUDIOS) {
         if (typeof item.lat !== 'number' || typeof item.lng !== 'number') continue;
 
         const marker = L.marker([item.lat, item.lng]).addTo(map);
 
-        // 1) Завжди видимий підпис із полем "заголовок"
         marker.bindTooltip(item["заголовок"], {
             permanent: true,
-            direction: "top",     // "top" | "right" | "left" | "bottom"
-            offset: [0, -18],     // трохи підняти над маркером
+            direction: "top",
+            offset: [0, -18],
             className: "my-tooltip"
         }).openTooltip();
 
-        // 2) Попап із детальною інформацією
         const html = `
-      <div class="popup">
-        <h3>${item["студія"]}</h3>
-        <div><strong>${item["заголовок"]}</strong></div>
-        <div class="muted">${item["адреса"]}</div>
-        <div>Контакт: ${item["контакт"]}</div>
-      </div>`;
+        <div class="popup">
+          <h3>${item["студія"]}</h3>
+          <div><strong>${item["заголовок"]}</strong></div>
+          <div class="muted">${item["адреса"]}</div>
+          <div>Контакт: ${item["контакт"]}</div>
+        </div>`;
         marker.bindPopup(html);
 
         bounds.push([item.lat, item.lng]);

@@ -1,0 +1,51 @@
+/* styles.css */
+
+html, body, #map {
+    height: 100%;
+    margin: 0;
+}
+
+.popup h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+}
+
+.popup .muted {
+    color: #555;
+    font-size: 12px;
+}
+
+/* Стилі тултіпу (підпису над маркером) */
+.leaflet-tooltip.my-tooltip {
+    background: #ffffff;
+    color: #111;
+    border: 1px solid #d0d0d0;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.25;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    white-space: nowrap;      /* для десктопа */
+    pointer-events: none;
+    transform: translateY(-2px);
+}
+
+.leaflet-tooltip.my-tooltip::before {
+    display: none;
+}
+
+/* Мобільна адаптація */
+@media (max-width: 600px) {
+    .leaflet-tooltip.my-tooltip {
+        font-size: 14px;
+        line-height: 1.3;
+        white-space: normal;
+        max-width: 60vw;
+        word-wrap: break-word;
+        padding: 6px 10px;
+    }
+}
+
+.leaflet-tooltip-top.my-tooltip {
+    margin-top: -4px;
+}
